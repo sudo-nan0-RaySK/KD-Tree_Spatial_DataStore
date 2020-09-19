@@ -51,11 +51,21 @@ void append(struct list* list, void* data){
     list->size += 1;
 }
 
-void print_list(struct list* list, double x, double y, char* outputfile){
+void print_list_2d(struct list* list, double x, double y, char* outputfile){
     FILE* fd = fopen(outputfile,"a+");
     struct list_node* tmp = list->head;
     while(tmp){
         fprintf(fd,"%lf %lf --> %s\n",x,y,(char*) tmp->data);
+        tmp = tmp->next;
+    }
+    fclose(fd);
+}
+
+void print_list_3d(struct list* list, double x, double y, double radius, char* outputfile){
+    FILE* fd = fopen(outputfile,"a+");
+    struct list_node* tmp = list->head;
+    while(tmp){
+        fprintf(fd,"%lf %lf %lf --> %s\n",x,y,radius,(char*) tmp->data);
         tmp = tmp->next;
     }
     fclose(fd);

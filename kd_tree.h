@@ -119,7 +119,7 @@ void _find_closest_helper(KDTree *tree, KDTreeNode *curr_node,
         memcpy(best_node,curr_node,sizeof(KDTreeNode));
 
         // If going left is a better choice, first go left and then right
-        if(curr_node->key[curr_dim]<key[curr_dim]){
+        if(curr_node->key[curr_dim]>key[curr_dim]){
             _find_closest_helper(tree,curr_node->left,key,depth+1
                 ,best_node,best_score,comparisons);
             _find_closest_helper(tree,curr_node->right,key,depth+1
@@ -137,7 +137,7 @@ void _find_closest_helper(KDTree *tree, KDTreeNode *curr_node,
     } else{
 
         // Prune right branch, go left.
-        if(curr_node->key[curr_dim] < key[curr_dim]){
+        if(curr_node->key[curr_dim] > key[curr_dim]){
             _find_closest_helper(tree,curr_node->left,key,depth+1
                 ,best_node,best_score,comparisons);
         
@@ -149,7 +149,7 @@ void _find_closest_helper(KDTree *tree, KDTreeNode *curr_node,
     }
 }
 
-KDTreeNode* find_closest(KDTree *tree, double* key){
+KDTreeNode* find_closest(KDTree *tree, double *key){
 
     double best_score = __DBL_MAX__;
     KDTreeNode* best_node = _get_new_kd_tree_node(NULL,tree->dimension);
@@ -164,4 +164,67 @@ KDTreeNode* find_closest(KDTree *tree, double* key){
 
     return best_node;
 
+}
+
+void _find_closest_in_radius_helper(KDTree *tree, double *key, double radius,
+    struct list *neighbors, int depth, double *best_score,
+    KDTreeNode *curr_node, int *comparisons){
+    
+    if(!curr_node){
+        return;
+    }
+
+    *comparisons+=1;
+    int curr_dim  = depth%(tree->dimension);
+    double curr_dis = get_euclidean_distance(curr_node->key, key, tree->dimension);
+
+    if(curr_dis <= radius){
+        append(neighbors,(void *)curr_node->data);
+    }
+
+    if(curr_dis <= *best_score){
+        *best_score = curr_dis;
+        
+        if(curr_node->key[curr_dim] > key[curr_dim]){
+            _find_closest_in_radius_helper(tree,key,radius,neighbors,depth+1,
+                best_score,curr_node->left,comparisons);
+            _find_closest_in_radius_helper(tree,key,radius,neighbors,depth+1,
+                best_score,curr_node->right,comparisons);
+
+        } else {
+            _find_closest_in_radius_helper(tree,key,radius,neighbors,depth+1,
+                best_score,curr_node->right,comparisons);
+            _find_closest_in_radius_helper(tree,key,radius,neighbors,depth+1,
+                best_score,curr_node->left,comparisons);
+        }
+
+    } else {
+
+        if(curr_node->key[curr_dim] > key[curr_dim]){
+            _find_closest_in_radius_helper(tree,key,radius,neighbors,depth+1,
+                best_score,curr_node->left,comparisons);
+        } else {
+            _find_closest_in_radius_helper(tree,key,radius,neighbors,depth+1,
+                best_score,curr_node->right,comparisons);
+        }
+
+    }
+
+}
+
+
+struct list* find_closest_in_radius(KDTree *tree, double *key, double radius){
+    double best_score = __DBL_MAX__;
+    int comparison_count = 0;
+    struct list* neighbors = get_new_list();
+
+    _find_closest_in_radius_helper(tree,key,radius,neighbors,0
+        ,&best_score,tree->root,&comparison_count);
+
+    for(int i  = 0; i<tree->dimension; i++){
+        printf("%lf ",key[i]);
+    }
+    printf("--> %d\n",comparison_count);
+
+    return neighbors;
 }

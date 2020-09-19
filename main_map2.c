@@ -44,19 +44,21 @@ int main(int argc, char** argv){
         kd_tree_insert(tree,key,(void*)data_line);
     }
     
-    double x,y;
+    double x,y,radius;
    
-
-    while(scanf("%lf %lf",&x,&y)==2){
+    while(scanf("%lf %lf %lf",&x,&y, &radius)==3){
         double key[] = {x,y};
-        KDTreeNode *node = find_closest(tree,key);
-        if(node->data->size==0){
+        struct list *ret = find_closest_in_radius(tree,key,radius);
+        if(ret->size == 0){
             FILE* fd = fopen(outputfile,"a+");
-            fprintf(fd,"%lf %lf --> NOTFOUND\n",x,y);
+            fprintf(fd,"%lf %lf %lf --> NOTFOUND\n",x,y,radius);
             fclose(fd);
             continue;
         }
-        print_list_2d(node->data,x,y,outputfile);
+        struct list_node *tmp = ret->head;
+        while(tmp){
+            print_list_3d((struct list*)tmp->data,x,y,radius,outputfile);
+            tmp = tmp->next;
+        }
     }
-    
 }
