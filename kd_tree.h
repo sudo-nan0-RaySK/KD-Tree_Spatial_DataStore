@@ -24,13 +24,23 @@ typedef struct KDTree{
     KDTreeNode* root;
 } KDTree;
 
-
+/**
+ * 
+ * Instantiate a new KDTree instance
+ * 
+ * */
 KDTree* get_new_kd_tree(int dimension){
     KDTree *tree = (KDTree*) malloc(sizeof(KDTree));
     tree->root = NULL;
     tree->dimension = dimension;
     return tree;
 }
+
+/**
+ * 
+ * Instantiate a new KDTreeNode instance
+ * 
+ * */
 
 KDTreeNode* _get_new_kd_tree_node(double *key, int dimension){
     KDTreeNode *node = (KDTreeNode*) malloc(sizeof(KDTreeNode));
@@ -41,10 +51,22 @@ KDTreeNode* _get_new_kd_tree_node(double *key, int dimension){
     return node;
 }
 
+/**
+ * 
+ * Add data to linked list inside KDTreeNode as diffrent,
+ * records with same co-ordinates might exist
+ * 
+ * */
 void _kd_node_add_data(KDTreeNode *node, void *data){
     append(node->data,data);
 }
 
+/**
+ * 
+ * Check if all dimensions (x,y in this case) are same for
+ * two nodes.
+ * 
+ * */
 int _keys_are_same(double* key1, double* key2, int key_size){
     for(int i = 0; i<key_size; ++i){
         if(key1[i]!=key2[i]){
@@ -54,6 +76,11 @@ int _keys_are_same(double* key1, double* key2, int key_size){
     return 1;
 }
 
+/**
+ * 
+ * Insert a node into KDTree
+ * 
+ * */
 void _kd_tree_insert_helper(KDTree *tree, KDTreeNode *curr_node,
     double *key, void *data, int depth){
 
@@ -88,10 +115,20 @@ void _kd_tree_insert_helper(KDTree *tree, KDTreeNode *curr_node,
     }
 }
 
+/**
+ * 
+ * Wrapper to insert into KDTree
+ * 
+ * */
 void kd_tree_insert(KDTree *tree, double *key, void *data){
     _kd_tree_insert_helper(tree,tree->root,key,data,0);
 }
 
+/**
+ * 
+ * Get euclidean distance of n-dimensions
+ * 
+ **/ 
 double get_euclidean_distance(double* key1, double* key2, int key_size){
     double squared_diff = 0.0;
     for(int i  = 0; i<key_size; ++i){
@@ -99,7 +136,11 @@ double get_euclidean_distance(double* key1, double* key2, int key_size){
     }
     return sqrt(squared_diff);
 }
-
+/**
+ * 
+ * Find a records closest to given co-ordinate
+ * 
+ **/
 void _find_closest_helper(KDTree *tree, KDTreeNode *curr_node, 
     double *key, int depth, KDTreeNode *best_node, 
     double *best_score, int* comparisons){
@@ -149,6 +190,11 @@ void _find_closest_helper(KDTree *tree, KDTreeNode *curr_node,
     }
 }
 
+/**
+ * 
+ * Wrapper to find a records closest to given co-ordinate
+ * 
+ * */
 KDTreeNode* find_closest(KDTree *tree, double *key){
 
     double best_score = __DBL_MAX__;
@@ -166,6 +212,11 @@ KDTreeNode* find_closest(KDTree *tree, double *key){
 
 }
 
+/**
+ * 
+ * Find closest record in a given radius for given co-ordinate
+ * 
+ * */
 void _find_closest_in_radius_helper(KDTree *tree, double *key, double radius,
     struct list *neighbors, int depth, double *best_score,
     KDTreeNode *curr_node, int *comparisons){
@@ -212,7 +263,11 @@ void _find_closest_in_radius_helper(KDTree *tree, double *key, double radius,
 
 }
 
-
+/**
+ * 
+ * Wrapper for finding closest record in a given radius for given co-ordinate
+ * 
+ * */
 struct list* find_closest_in_radius(KDTree *tree, double *key, double radius){
     double best_score = __DBL_MAX__;
     int comparison_count = 0;

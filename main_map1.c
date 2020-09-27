@@ -21,11 +21,15 @@ int main(int argc, char** argv){
         printf("Usage ./map1 datafile outputfile < inputfile\n");
         exit(0);
     }
+
+    /* Readoing records from csv in input */
     struct csv_meta_data* meta_data = get_csv_meta_data(datafile);
     struct csv_reader* reader = get_csv_data_object(datafile);
     
+    /* Instantiate a KDTree with 2 dimensions */
     KDTree *tree = get_new_kd_tree(2);
 
+    /* Format each record from csv data and insert it in KDTree */
     for(int i = 0; i<meta_data->records_count; i++){
         char* data_line = (char*) malloc(MAX_OUTPUT_ROW_SIZE*sizeof(char));
         
@@ -46,7 +50,11 @@ int main(int argc, char** argv){
     
     double x,y;
    
-
+    /**
+     * Read data from STDIN, output results to ouputfile 
+     * and comparison cout to STDOUT
+     * 
+     **/
     while(scanf("%lf %lf",&x,&y)==2){
         double key[] = {x,y};
         KDTreeNode *node = find_closest(tree,key);
